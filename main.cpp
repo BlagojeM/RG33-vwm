@@ -1,3 +1,7 @@
+//Dok ne napravis MakeFile ovo radi posao
+//	g++ -o program main.cpp LevelOne.cpp -lglut -lGL -lGLU -lm
+//	./program
+
 #include <iostream>
 #include <GL/glut.h>
 
@@ -6,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <math.h>
+#include "LevelOne.h"
 
 float lx=0.0f,lz=-1.0f;
 float angle=0.0;
@@ -20,9 +25,10 @@ int main(int argc, char **argv){
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
 
-	glutInitWindowSize(300, 300);
+	glutInitWindowSize(300, 150);
 	glutInitWindowPosition(100, 100);
 	glutCreateWindow(argv[0]);
+	glutFullScreen();
 
 
 	glutKeyboardFunc(on_keyboard);
@@ -59,82 +65,7 @@ static void on_display(void){
 		  0.0f, 1.0f,  0.0f);
 
 
-	glBegin(GL_LINES);
-		glVertex3f(-1, 0, 0);
-		glVertex3f(1, 0, 0);
-		
-		glVertex3f(0, -1, 0);
-		glVertex3f(0, 1, 0);
-
-		glVertex3f(0, 0, -1);
-		glVertex3f(0, 0, 1);	
-	glEnd();
-
-	glBegin(GL_QUADS);
-		//top
-
-		glColor3f(1.0f, 0.0f, 0.0f);
-		glNormal3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(-1.0f, 1.0f, 1.0f);
-		glVertex3f(1.0f, 1.0f, 1.0f);
-		glVertex3f(1.0f, 1.0f, -1.0f);
-		glVertex3f(-1.0f, 1.0f, -1.0f);
-
-		//left
-
-		glColor3f(0.8f, 0.8f, 0.8f);
-		glNormal3f(0.0f, 0.0f, 1.0f);
-		glVertex3f(-1.0f, -1.0f, 1.0f);
-		glVertex3f(-1.0f, 1.0f, 1.0f);
-		glVertex3f(-1.0f, 1.0f, -1.0f);
-		glVertex3f(-1.0f, -1.0f, -1.0f);
-
-		//right
-
-		glColor3f(0.8f, 0.8f, 0.8f);
-		glNormal3f(0.0f, 0.0f, 1.0f);
-		glVertex3f(1.0f, -1.0f, 1.0f);
-		glVertex3f(1.0f, 1.0f, 1.0f);
-		glVertex3f(1.0f, 1.0f, -1.0f);
-		glVertex3f(1.0f,- 1.0f, -1.0f);
-
-
-		//bottom
-
-		glColor3f(0.2f, 0.2f, 0.2f);
-		glNormal3f(0.0f, 1.0f, 0.0f);
-		glVertex3f(-10.0f, -1.0f, 10.0f);
-		glVertex3f(10.0f, -1.0f, 10.0f);
-		glVertex3f(10.0f, -1.0f, -10.0f);
-		glVertex3f(-10.0f, -1.0f, -10.0f);
-
-		//front-left
-
-		glColor3f(0.5f, 0.5f, 0.5f);
-		glNormal3f(0.0f, 0.0f, 1.0f);
-		glVertex3f(-10.0f, 2.0f, 1.0f);
-		glVertex3f(-10.0f, -1.0f, 1.0f);
-		glVertex3f(-1.0f, -1.0f, 1.0f);
-		glVertex3f(-1.0f, 2.0f, 1.0f);
-
-		//front-right
-
-		glColor3f(0.5f, 0.5f, 0.5f);
-		glNormal3f(0.0f, 0.0f, 1.0f);
-		glVertex3f(10.0f, 2.0f, 1.0f);
-		glVertex3f(10.0f, -1.0f, 1.0f);
-		glVertex3f(1.0f, -1.0f, 1.0f);
-		glVertex3f(1.0f, 2.0f, 1.0f);
-
-		//front-top
-
-		glColor3f(0.5f, 0.5f, 0.5f);
-		glNormal3f(0.0f, 0.0f, 1.0f);
-		glVertex3f(-1.0f, 1.0f, 1.0f);
-		glVertex3f(-1.0f, 2.0f, 1.0f);
-		glVertex3f(1.0f, 2.0f, 1.0f);
-		glVertex3f(1.0f, 1.0f, 1.0f);
-	glEnd();
+	LevelOne x;
 
 	glutSwapBuffers();
 }
