@@ -55,9 +55,9 @@ static void on_display(void){
      * Kreira se kocka i primenjuje se geometrijska transformacija na
      * istu.
      */
-    glColor3f(0, 0, 1);
-    glTranslatef(0, .5, 0);
-    glScalef(1, 2, 1);
+    //glColor3f(0, 0, 1);
+    //glTranslatef(0, .5, 0);
+    //glScalef(1, 2, 1);
     glutWireCube(1);
 
 	gluLookAt(xx, 0, zz,
