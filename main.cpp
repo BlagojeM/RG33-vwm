@@ -1,5 +1,4 @@
-//Dok ne napravis MakeFile ovo radi posao
-//	g++ -o program main.cpp LevelOne.cpp -lglut -lGL -lGLU -lm
+// g++ -o program main.cpp Room.cpp Wall.cpp -lglut -lGL -lGLU -lm
 //	./program
 
 #include <iostream>
@@ -11,6 +10,9 @@
 
 #include <math.h>
 #include "LevelOne.h"
+#include "Room.hpp"
+#include "Wall.hpp"
+
 
 float lx=0.0f,lz=-1.0f;
 float angle=0.0;
@@ -60,12 +62,29 @@ static void on_display(void){
     //glScalef(1, 2, 1);
     glutWireCube(1);
 
-	gluLookAt(xx, 0, zz,
-		  xx + lx, 0,  zz + lz,
+	gluLookAt(xx, 0.5f, zz,
+		  xx + lx, 0.5f,  zz + lz,
 		  0.0f, 1.0f,  0.0f);
 
 
-	LevelOne x;
+	//LevelOne x;
+	glm::vec3 a = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 b = glm::vec3(5.0f, 0.0f, 0.0f);
+	glm::vec3 c = glm::vec3(7.0f, 0.0f, 13.0f);
+	glm::vec3 d = glm::vec3(-3.0f, 0.0f, 7.0f);
+
+	std::vector<glm::vec3> zidovi;
+	
+	zidovi.push_back(a);
+	zidovi.push_back(b);
+	zidovi.push_back(c);
+	zidovi.push_back(d);
+	zidovi.push_back(a);
+	
+
+	Room sampleRoom(zidovi);
+	sampleRoom.Draw();
+
 
 	glutSwapBuffers();
 }
