@@ -11,9 +11,10 @@
 class Room{
     private:
         std::vector<Wall> listOfWalls;
+        std::vector<glm::vec3> listOfPoints;
     
     public:
-	static std::vector<Room*> listOfRooms;
+	    static std::vector<Room*> listOfRooms;
 
         Room(std::vector<glm::vec3> vec);
         void Draw();

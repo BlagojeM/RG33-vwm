@@ -5,6 +5,7 @@
 #include <GL/glut.h>
 
 #include <glm/glm.hpp>
+#include <glm/matrix.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -12,7 +13,9 @@
 //#include "LevelOne.h"
 #include "Room.hpp"
 #include "Wall.hpp"
-#include "Person.hpp"
+#include "Player.hpp"
+#include "Camera.hpp"
+#include "Position.hpp"
 
 #define TIMER_INTERVAL1 10
 #define TIMER_INTERVAL2 10
@@ -37,13 +40,28 @@ float person_y = 0.0f;
 float jump_ongoing = 1.0f;
 
 
+
+
+glm::vec3 p_pos = glm::vec3(0.0f, 1.35f, 0.0f);
+float angle_1 = 0.5f;
+float angle_2 = 0.0f;
+char view_mode = 0; // 0 for first person view, 1 for third person view
+glm::vec3 eye_point, ref_point, up_vec;
+
+
+
+
 static void on_display(void);
 static void on_reshape(int width, int height);
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_mouse(int x, int y);
 static void on_timer1(int);
 static void on_timer2(int);
+static Player create_player();
+static Room create_room_1();
 
+static Camera *activeCamera = nullptr;
+static Player *activePlayer = nullptr;
 
 int main(int argc, char **argv){
 	glutInit(&argc, argv);
@@ -58,12 +76,17 @@ int main(int argc, char **argv){
 	glutKeyboardFunc(on_keyboard);
 	glutDisplayFunc(on_display);
 	glutReshapeFunc(on_reshape);
-	//glutMotionFunc(on_mouse);
 	glutPassiveMotionFunc(on_mouse);
-	glutTimerFunc(TIMER_INTERVAL1, on_timer1, TIMER_ID1);
+	glutTimerFunc(TIMER_INTERVAL1, on_timer1, TIMER_ID1);//???da li ovde???
 
 	glClearColor(0.75, 0.75, 0.75, 0);
 	glEnable(GL_DEPTH_TEST);
+
+
+	Player player = Player();
+	Camera cam = Camera(&player);
+	activePlayer = &player;
+	activeCamera = &cam;
 
 	glutMainLoop();
 	return 0;
@@ -87,70 +110,41 @@ static void on_timer2(int){
 }
 static void on_display(void){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glColor3f(0, 0, 1);
 
     /* Podesava se tacka pogleda. */
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    /*
-     * Kreira se kocka i primenjuje se geometrijska transformacija na
-     * istu.
-     */
-    //glColor3f(0, 0, 1);
-    //glTranslatef(0, .5, 0);
-    //glScalef(1, 2, 1);
-    glutWireCube(1);
-
-	gluLookAt(xx, 0.5f + yy +jump_ongoing, zz,
-		  xx + lx, 0.5f + yy + yy_par + jump_ongoing,  zz + lz,
-		  0.0f, 1.0f,  0.0f);
-
-
-	//LevelOne x;
-	glm::vec3 a = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 b = glm::vec3(5.0f, 0.0f, 0.0f);
-	glm::vec3 c = glm::vec3(5.0f, 0.0f, 5.0f);
-	glm::vec3 d = glm::vec3(10.0f, 0.0f, 2.5f);
-	glm::vec3 e = glm::vec3(15.0f, 0.0f, 5.0f);
-	glm::vec3 f = glm::vec3(15.0f, 0.0f, 0.0f);
-	glm::vec3 g = glm::vec3(20.0f, 0.0f, 0.0f);
-	glm::vec3 h = glm::vec3(15.0f, 0.0f, 15.0f);
-	glm::vec3 i = glm::vec3(10.0f, 0.0f, 10.0f);
-	glm::vec3 j = glm::vec3(5.0f, 0.0f, 15.0f);
-
-
-	std::vector<glm::vec3> zidovi, kaoCovek;
+	glLoadMatrixf(glm::value_ptr(activeCamera->getView()));
+	//gluLookAt(0, 0, 0, 0, 0, 1, 0,1,0);
 	
-	zidovi.push_back(a);
-	zidovi.push_back(b);
-	zidovi.push_back(c);
-	zidovi.push_back(d);
-	zidovi.push_back(e);
-	zidovi.push_back(f);
-	zidovi.push_back(g);
-	zidovi.push_back(h);
-	zidovi.push_back(i);
-	zidovi.push_back(j);
-	zidovi.push_back(a);
+	glColor3f(1, 0, 0);
+	glPushMatrix();
+		glTranslatef(0, 0, 2);
+		glutSolidCube(0.5);
+	glPopMatrix();
+	glColor3f(0, 1, 0);
+	glPushMatrix();
+		glTranslatef(0, 0, -2);
+		glutSolidCube(0.5);
+	glPopMatrix();
+	glColor3f(0, 0, 1);
+	glPushMatrix();
+		glTranslatef(2, 0, 0);
+		glutSolidCube(0.5);
+	glPopMatrix();
+	glColor3f(0, 0, 0);
+	glPushMatrix();
+		glTranslatef(-2, 0, 0);
+		glutSolidCube(0.5);
+	glPopMatrix();
 	
 
-	Room sampleRoom(zidovi);
-	sampleRoom.Draw();
+	Room room_1(create_room_1());
+	glPushMatrix();
+		room_1.Draw();
+	glPopMatrix();
 
-
-	a = glm::vec3(0.25f + xx, 0.0f, zz + 0.25f);
-	b  = glm::vec3(-0.25f  + xx, 0.0f, zz + 0.25f);
-	c = glm::vec3(-0.25f + xx, 0.0f, zz - 0.25f);
-	d = glm::vec3(0.25f + xx, 0.0f, zz - 0.25f);
-
-	kaoCovek.push_back(a);
-	kaoCovek.push_back(b);
-	kaoCovek.push_back(c);
-	kaoCovek.push_back(d);
-
-	Person testCovek(kaoCovek);
-	testCovek.Draw();
 	glutSwapBuffers();
 }
 
@@ -171,46 +165,72 @@ static void on_keyboard(unsigned char key, int x, int y)
 	trans = glm::rotate(trans, (float)0.0174532925, glm::vec3(0.0f, 1.0f, 0.0f));
 
 	float fraction = 0.1f;
+	// switch (key) {
+	// 	case 27:
+	// 		/* Zavrsava se program. */
+	// 		exit(0);
+	// 		break;
+	// 	case 'a':
+	// 		angle -= 0.02f;
+	// 		lx = sin(angle);
+	// 		lz = -cos(angle);
+	// 		break;
+	// 	case 'd':
+	// 		angle += 0.02f;
+	// 		lx = sin(angle);
+	// 		lz = -cos(angle);
+	// 		break;
+	// 	case 'w':
+	// 		xx += lx * fraction;
+	// 		zz += lz * fraction;
+	// 		break;
+	// 	case 's':
+	// 		xx -= lx * fraction;
+	// 		zz -= lz * fraction;
+	// 		break;
+	// 	case 'j':
+	// 		yy_par += 0.05f;
+	// 		break;
+	// 	case 'k':
+	// 		yy_par -= 0.05f;
+	// 		break;
+	// 	case 'n':
+	// 		yy += 0.1f;
+	// 		break;
+	// 	case 'm':
+	// 		yy -= 0.1f;
+	// 		break;
+	// 	case 32: //spacebar
+	// 		if(!jump_ongoing){
+	// 			glutTimerFunc(TIMER_INTERVAL2, on_timer2, TIMER_ID2);
+	// 			jump_ongoing = 1;
+	// 		}
+	// 		break;
+	// }
+
+
 	switch (key) {
 		case 27:
 			/* Zavrsava se program. */
 			exit(0);
 			break;
-		case 'a':
-			angle -= 0.02f;
-			lx = sin(angle);
-			lz = -cos(angle);
-			break;
-		case 'd':
-			angle += 0.02f;
-			lx = sin(angle);
-			lz = -cos(angle);
-			break;
 		case 'w':
-			xx += lx * fraction;
-			zz += lz * fraction;
+			activePlayer->translate(glm::vec3(0, 0, -0.1));
 			break;
 		case 's':
-			xx -= lx * fraction;
-			zz -= lz * fraction;
+			activePlayer->translate(glm::vec3(0, 0, 0.1));
 			break;
-		case 'j':
-			yy_par += 0.05f;
+		case 'a':
+			activePlayer->translate(glm::vec3(-0.1, 0, 0));
 			break;
-		case 'k':
-			yy_par -= 0.05f;
+		case 'd':
+			activePlayer->translate(glm::vec3(0.1, 0, 0));
 			break;
-		case 'n':
-			yy += 0.1f;
+		case 'e':
+			activePlayer->rotate(-0.05, glm::vec3(0, 1, 0));
 			break;
-		case 'm':
-			yy -= 0.1f;
-			break;
-		case 32: //spacebar
-			if(!jump_ongoing){
-				glutTimerFunc(TIMER_INTERVAL2, on_timer2, TIMER_ID2);
-				jump_ongoing = 1;
-			}
+		case 'q':
+			activePlayer->rotate(0.05, glm::vec3(0, 1, 0));
 			break;
 	}
 
@@ -225,16 +245,56 @@ static void on_keyboard(unsigned char key, int x, int y)
 
 static void on_mouse(int x, int y){
 	if(x > width_a/2)
-		angle += x*0.00005f;
+		angle_1 += x*0.00005f;
 	if(x < width_a/2)
-		angle -= x*0.00005f;
+		angle_1 -= x*0.00005f;
 	if(y > height_a/2)
 		//yy_par -= 0.01f;
-		angle1 -= y*0.00005f;
+		angle_2 -= y*0.00005f;
 	if(y < height_a/2)
 		//yy_par += 0.01f;
-		angle1 += y*0.000005f;
-	lx = sin(angle);
-	lz = -cos(angle);
+		angle_2 += y*0.000005f;
+}
 
+
+
+
+
+
+
+
+
+
+
+static Room create_room_1(){
+	glm::vec3 a = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 b = glm::vec3(5.0f, 0.0f, 0.0f);
+	glm::vec3 c = glm::vec3(5.0f, 0.0f, 5.0f);
+	glm::vec3 d = glm::vec3(10.0f, 0.0f, 2.5f);
+	glm::vec3 e = glm::vec3(15.0f, 0.0f, 5.0f);
+	glm::vec3 f = glm::vec3(15.0f, 0.0f, 0.0f);
+	glm::vec3 g = glm::vec3(20.0f, 0.0f, 0.0f);
+	glm::vec3 h = glm::vec3(15.0f, 0.0f, 15.0f);
+	glm::vec3 i = glm::vec3(10.0f, 0.0f, 10.0f);
+	glm::vec3 j = glm::vec3(5.0f, 0.0f, 15.0f);
+
+
+	std::vector<glm::vec3> zidovi;
+	
+	zidovi.push_back(a);
+	zidovi.push_back(b);
+	zidovi.push_back(c);
+	zidovi.push_back(d);
+	zidovi.push_back(e);
+	zidovi.push_back(f);
+	zidovi.push_back(g);
+	zidovi.push_back(h);
+	zidovi.push_back(i);
+	zidovi.push_back(j);
+	zidovi.push_back(a);
+	
+
+	Room sampleRoom(zidovi);
+
+	return sampleRoom;
 }
