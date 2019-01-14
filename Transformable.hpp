@@ -14,8 +14,6 @@ class Transformable{
         Transformable(Position *pos);
         void translate(glm::vec3 translate);
         void rotate(float angle, glm::vec3 aroundVec);
-
-    private:
         Position *pos = nullptr;
 };
 

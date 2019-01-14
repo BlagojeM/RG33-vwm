@@ -15,9 +15,8 @@ enum class CamMode {
 class Camera {
     private:
         glm::mat4 viewMatrix = glm::mat4(1);
-    protected: 
+    public: 
         Position *attachedTo = nullptr;
-    public:
         Camera() = default;
         Camera(Position *attachTo);
         

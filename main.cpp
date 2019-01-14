@@ -18,24 +18,15 @@
 #include "Position.hpp"
 
 #define TIMER_INTERVAL1 10
-#define TIMER_INTERVAL2 5
+#define TIMER_INTERVAL2 10
 #define TIMER_ID1 0
 #define TIMER_ID2 0
 
-
-float lx=0.0f,lz=-1.0f;
-float angle=0.0f;
-float angle1=0.0f;
-float xx=0.0f,zz=0.0f;
-float yy = 0.0f, yy_par = 0.0f;
-
-float mouse_x = 0.0f;
-float mouse_y = 0.0f;
 int width_a = 0;
 int height_a = 0;
-
-float person_x = 0.0f;
-float person_y = 0.0f;
+int mouse_x = 0;
+int mouse_x1 = 0;
+int delta_x = 0;
 
 float jump_ongoing = 1.0f;
 int w_d = 1;
@@ -44,15 +35,9 @@ int a_d = 1;
 int d_d = 1;
 int q_d = 1;
 int e_d = 1;
-
-
-
-
-glm::vec3 p_pos = glm::vec3(0.0f, 1.35f, 0.0f);
-float angle_1 = 0.5f;
-float angle_2 = 0.0f;
+int m_l = 1;
+int m_r = 1;
 char view_mode = 0; // 0 for first person view, 1 for third person view
-glm::vec3 eye_point, ref_point, up_vec;
 
 
 
@@ -60,15 +45,16 @@ glm::vec3 eye_point, ref_point, up_vec;
 static void on_display(void);
 static void on_reshape(int width, int height);
 static void on_keyboard(unsigned char key, int x, int y);
+static void keyUp (unsigned char key, int x, int y);
 static void on_mouse(int x, int y);
 static void on_timer1(int);
 static void on_timer2(int);
 static void on_timer3(int);
 static void on_timer4(int);
 static void on_timer5(int);
+static void mouse_l_timer(int);
 static Player create_player();
 static Room create_room_1();
-void keyUp (unsigned char key, int x, int y);
 
 static Camera *activeCamera = nullptr;
 static Player *activePlayer = nullptr;
@@ -80,7 +66,7 @@ int main(int argc, char **argv){
 	glutInitWindowSize(300, 150);
 	glutInitWindowPosition(100, 100);
 	glutCreateWindow(argv[0]);
-	glutFullScreen();
+	//glutFullScreen();
 
 
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
@@ -90,7 +76,7 @@ int main(int argc, char **argv){
 	glutDisplayFunc(on_display);
 	glutReshapeFunc(on_reshape);
 	glutPassiveMotionFunc(on_mouse);
-	glutTimerFunc(TIMER_INTERVAL1, on_timer1, TIMER_ID1);//???da li ovde???
+	//glutTimerFunc(TIMER_INTERVAL1, on_timer1, TIMER_ID1);//???da li ovde???
 
 	glClearColor(0.75, 0.75, 0.75, 0);
 	glEnable(GL_DEPTH_TEST);
@@ -106,12 +92,8 @@ int main(int argc, char **argv){
 }
 
 static void on_timer1(int){
-	
-	glutWarpPointer(width_a/2, height_a/2);
-
-	glutTimerFunc(TIMER_INTERVAL1, on_timer1, TIMER_ID1);
-	glutPostRedisplay();
 }
+
 static void on_timer2(int){
 	activePlayer->translate(glm::vec3(0, 0, -0.05));
 	if(w_d)
@@ -155,6 +137,19 @@ static void on_timer7(int){
 	glutPostRedisplay();
 	
 }
+
+static void mouse_l_timer(int){
+		glutTimerFunc(TIMER_INTERVAL2, mouse_l_timer, TIMER_ID2);
+	glutPostRedisplay();
+}
+
+static void mouse_r_timer(int){
+	activePlayer->rotate(-0.001, glm::vec3(0, 1, 0));
+	if(m_r)
+		glutTimerFunc(TIMER_INTERVAL2, mouse_r_timer, TIMER_ID2);
+	glutPostRedisplay();
+}
+
 static void on_display(void){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -163,6 +158,7 @@ static void on_display(void){
     glLoadIdentity();
 
 	glLoadMatrixf(glm::value_ptr(activeCamera->getView()));
+
 	//gluLookAt(0, 0, 0, 0, 0, 1, 0,1,0);
 	
 
@@ -202,7 +198,11 @@ static void on_display(void){
 	glPushMatrix();
 		room_1.Draw();
 	glPopMatrix();
-
+	
+	glPushMatrix();
+		glMultMatrixf(glm::value_ptr(activePlayer->getModelMatrix()));
+		activePlayer->Draw();
+	glPopMatrix();
 	glutSwapBuffers();
 }
 
@@ -239,11 +239,11 @@ static void on_keyboard(unsigned char key, int x, int y)
 			d_d = 1;
 			glutTimerFunc(TIMER_INTERVAL2, on_timer4, TIMER_ID2);
 			break;
-		case 'e':
+		case 'k':
 			e_d = 1;
 			glutTimerFunc(TIMER_INTERVAL2, on_timer6, TIMER_ID2);
 			break;
-		case 'q':
+		case 'j':
 			q_d = 1;
 			glutTimerFunc(TIMER_INTERVAL2, on_timer7, TIMER_ID2);
 			break;
@@ -251,7 +251,7 @@ static void on_keyboard(unsigned char key, int x, int y)
 
 	glutPostRedisplay();
 }
-void keyUp (unsigned char key, int x, int y)
+static void keyUp (unsigned char key, int x, int y)
 {
     switch (key) {
 		case 27:
@@ -270,35 +270,38 @@ void keyUp (unsigned char key, int x, int y)
 		case 'd':
 			d_d = 0;
 			break;
-		case 'e':
+		case 'k':
 			e_d = 0;
 			break;
-		case 'q':
+		case 'j':
 			q_d = 0;
 			break;
 	}
 }
 
 static void on_mouse(int x, int y){
-	if(x > width_a/2)
-		angle_1 += x*0.00005f;
-	if(x < width_a/2)
-		angle_1 -= x*0.00005f;
-	if(y > height_a/2)
-		//yy_par -= 0.01f;
-		angle_2 -= y*0.00005f;
-	if(y < height_a/2)
-		//yy_par += 0.01f;
-		angle_2 += y*0.000005f;
+		//m_r = 1;
+		//mouse_x = mouse_x - 20;
+		
+		float sensitivity = 0.005;
+		delta_x = x - width_a/2;
+		activePlayer->rotate(delta_x*sensitivity,glm::vec3( 0, 1, 0 ));
+		glutWarpPointer(width_a/2, height_a/2);
+		glutPostRedisplay();
+		//float delta_y = y - width_a/2;
+
+	//	glutTimerFunc(TIMER_INTERVAL2, mouse_r_timer, TIMER_ID2);
+		//m_r = 0;
+       // if(x < width_a/2){
+       // 	m_l = 1;
+       // 	//glutTimerFunc(TIMER_INTERVAL2, mouse_l_timer, TIMER_ID2);
+       // 	mouse_x = mouse_x + 20;
+       // }
+       // else
+       // 	m_l = 0;
+
+	
 }
-
-
-
-
-
-
-
-
 
 
 

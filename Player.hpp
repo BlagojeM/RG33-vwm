@@ -1,6 +1,7 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
+#include <glm/gtc/type_ptr.hpp>
 #include <GL/glut.h>
 #include <vector>
 #include <glm/vec3.hpp>

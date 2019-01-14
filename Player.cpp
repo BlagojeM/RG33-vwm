@@ -5,11 +5,7 @@ Player::Player() : Transformable(this) {
 }
 
 void Player::Draw(){
-
-	glPushMatrix();
-		glBegin(GL_QUADS);
-		
-		
-		glEnd();
-	glPopMatrix();
+		glColor3f(1, 0, 1);
+		glTranslatef(0, 0, -2);
+		glutSolidCube(0.2);
 }
