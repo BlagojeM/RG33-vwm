@@ -1,8 +1,14 @@
-// g++ -o program main.cpp Room.cpp Wall.cpp -lglut -lGL -lGLU -lm
+// g++ -o program m sa imenom texture_nameain.cpp Room.cpp Wall.cpp -lgnut -lGL -lGLU -lm
 //	./program
 
+#include <stdio.h>
 #include <iostream>
+#include <vector>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include <GL/glut.h>
+#include "image.h"
+#include "objloader.h"
 
 #include <glm/glm.hpp>
 #include <glm/matrix.hpp>
@@ -37,7 +43,85 @@ int q_d = 1;
 int e_d = 1;
 int m_l = 1;
 int m_r = 1;
+
 char view_mode = 0; // 0 for first person view, 1 for third person view
+float alpha = 0;
+int alpha1 = 0;
+int follow = 1;
+GLuint texture_name;
+glm::mat4 screen;
+
+
+Image * img = nullptr;
+Image * img1 = nullptr;
+Image * img2 = nullptr;
+Image * img3 = nullptr;
+Image * img4 = nullptr;
+Image * img5 = nullptr;
+
+void make_texture() 
+{
+
+  /* Ukljucuje se testiranje z-koordinate piksela. */
+    glEnable(GL_DEPTH_TEST);
+
+    /* Ukljucuju se teksture. */
+    glEnable(GL_TEXTURE_2D);
+
+    glTexEnvf(GL_TEXTURE_ENV,
+              GL_TEXTURE_ENV_MODE,
+              GL_REPLACE);
+    glBindTexture(GL_TEXTURE_2D, texture_name);
+    //glTexParameteri(GL_TEXTURE_2D,
+    //                GL_TEXTURE_WRAP_S, GL_CLAMP);
+    //glTexParameteri(GL_TEXTURE_2D,
+    //                GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	if(alpha1 == 0){
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+					img->width, img->height, 0,
+					GL_RGB, GL_UNSIGNED_BYTE, img->pixels);
+	}
+	if(alpha1 == 1){
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 img1->width, img1->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, img1->pixels);
+	}
+	if(alpha1 == 2){
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 img2->width, img2->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, img2->pixels);
+	}
+	if(alpha1 == 3){
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 img3->width, img3->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, img3->pixels);
+	}
+	if(alpha1 == 4){
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 img4->width, img4->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, img4->pixels);
+	}
+	if(alpha1 == 5){
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 img5->width, img5->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, img5->pixels);
+	}
+glBindTexture(GL_TEXTURE_2D, 0);
+
+
+}
+
+void unbind_texture()
+{
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+std::vector<glm::vec3>  out_vertices;
+std::vector<glm::vec2>  out_uvs;
+std::vector<glm::vec3>  out_normals;
 
 
 
@@ -52,6 +136,10 @@ static void on_timer2(int);
 static void on_timer3(int);
 static void on_timer4(int);
 static void on_timer5(int);
+static void on_timer6(int);
+static void on_timer7(int);
+static void colition_timer(int);
+
 static void mouse_l_timer(int);
 static Player create_player();
 static Room create_room_1();
@@ -66,7 +154,7 @@ int main(int argc, char **argv){
 	glutInitWindowSize(300, 150);
 	glutInitWindowPosition(100, 100);
 	glutCreateWindow(argv[0]);
-	//glutFullScreen();
+	glutFullScreen();
 
 
 	glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
@@ -75,21 +163,49 @@ int main(int argc, char **argv){
 	glutKeyboardFunc(on_keyboard);
 	glutDisplayFunc(on_display);
 	glutReshapeFunc(on_reshape);
-	glutPassiveMotionFunc(on_mouse);
-	//glutTimerFunc(TIMER_INTERVAL1, on_timer1, TIMER_ID1);//???da li ovde???
-
-	glClearColor(0.75, 0.75, 0.75, 0);
+	//glutPassiveMotionFunc(on_mouse);
+	glutTimerFunc(TIMER_INTERVAL2, colition_timer, TIMER_ID2);
+	glClearColor(0.5, 0.4, 0.4, 0);
 	glEnable(GL_DEPTH_TEST);
+	
 
 
 	Player player = Player();
 	Camera cam = Camera(&player);
 	activePlayer = &player;
 	activeCamera = &cam;
+	screen = activePlayer->getModelMatrix();
+
+	img = image_init(200, 200);
+	img1 = image_init(200, 200);
+	img2 = image_init(200, 200);
+	img3 = image_init(200, 200);
+	img4 = image_init(200, 200);
+	img5 = image_init(200, 200);	
+	/* Ucitas sliku */
+	image_read(img, "texture.bmp");
+	image_read(img1, "texture1.bmp");
+	image_read(img2, "texture2.bmp");
+	image_read(img3, "texture3.bmp");
+	image_read(img4, "texture4.bmp");
+	image_read(img5, "texture5.bmp");
+
+	/* Generises ime teksture */
+	glGenTextures(1, &texture_name);
+
+	/* Ucitas objekat (iscrtavanje u on display) */
+	const char * path = "cube.obj";
+	loadOBJ(path, out_vertices, out_uvs, out_normals);
+
+	/* Boiler plate (dodeljivanje teksturi sa imenom texture_name sliku) */
+	make_texture();
 
 	glutMainLoop();
+
 	return 0;
 }
+
+
 
 static void on_timer1(int){
 }
@@ -137,7 +253,6 @@ static void on_timer7(int){
 	glutPostRedisplay();
 	
 }
-
 static void mouse_l_timer(int){
 		glutTimerFunc(TIMER_INTERVAL2, mouse_l_timer, TIMER_ID2);
 	glutPostRedisplay();
@@ -148,6 +263,23 @@ static void mouse_r_timer(int){
 	if(m_r)
 		glutTimerFunc(TIMER_INTERVAL2, mouse_r_timer, TIMER_ID2);
 	glutPostRedisplay();
+}
+
+static void colition_timer(int){
+	glm::mat4 tmpMatrix = glm::mat4(activePlayer->getModelMatrix());
+
+	if(tmpMatrix[3][0] > 7.95)
+		tmpMatrix[3][0] = 7.95;
+	if(tmpMatrix[3][0] < -5.95)
+		tmpMatrix[3][0] = -5.95;
+	if(tmpMatrix[3][2] > 3.95)
+		tmpMatrix[3][2] = 3.95;
+	if(tmpMatrix[3][2] < -3.95)
+		tmpMatrix[3][2] = -3.95;
+	activePlayer->setModelMatrix(tmpMatrix);
+	glutPostRedisplay();
+	glutTimerFunc(TIMER_INTERVAL2, colition_timer, TIMER_ID2);
+
 }
 
 static void on_display(void){
@@ -185,8 +317,7 @@ static void on_display(void){
 		glutSolidCube(0.5);
 	glPopMatrix();
 
-
-	//black cube for testing
+//black cube for testing
 	glColor3f(0, 0, 0);
 	glPushMatrix();
 		glTranslatef(-2, 0, 0);
@@ -199,12 +330,54 @@ static void on_display(void){
 		room_1.Draw();
 	glPopMatrix();
 	
+
+
+	 /* Ukljucuju se teksture. */
+ 	//glEnable(GL_LIGHTING);
 	glPushMatrix();
-		glMultMatrixf(glm::value_ptr(activePlayer->getModelMatrix()));
-		activePlayer->Draw();
+	/* Ukljuvcis teksturu sa imenom texture_name */
+		if(follow)
+			glMultMatrixf(glm::value_ptr(activePlayer->getModelMatrix()));
+		else
+			glMultMatrixf(glm::value_ptr(screen));
+
+		glRotatef(-20, 0, 1, 0);
+		glRotatef(13, 1, 0, 0);
+		if(alpha)
+			glRotatef(180, 0, 1, 0);
+		glTranslatef(0, 0, -2);
+		glRotatef(90, 0, 1, 0);
+
+
+		glScalef(0.05*0.45, 1*0.45, 1.6*0.45);
+		glBindTexture(GL_TEXTURE_2D, texture_name);
+
+		int numOfVertices = out_vertices.size();
+		int numOfNormals = out_normals.size();
+		int numOfTextureCoordinates = out_uvs.size(); 
+
+		glBegin(GL_TRIANGLES);
+
+			for (int i=0; i<numOfVertices; i++) {
+
+				if (i < numOfNormals) {
+					glNormal3f(out_normals[i].x, out_normals[i].y, out_normals[i].z);
+				}
+
+				if (i < numOfTextureCoordinates) {
+					glTexCoord2f(out_uvs[i].s, out_uvs[i].t);
+				}
+
+				glVertex3f(out_vertices[i].x, out_vertices[i].y, out_vertices[i].z);
+			}
+		glEnd();
+
+		/* Iskljucis teksture */
+		glBindTexture(GL_TEXTURE_2D, 0);
 	glPopMatrix();
 	glutSwapBuffers();
 }
+
 
 static void on_reshape(int width, int height)
 {
@@ -214,6 +387,7 @@ static void on_reshape(int width, int height)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(60.0f, (float) width/height,0.01, 1000);
+	glutPostRedisplay();
 }
 
 static void on_keyboard(unsigned char key, int x, int y)
@@ -246,6 +420,28 @@ static void on_keyboard(unsigned char key, int x, int y)
 		case 'j':
 			q_d = 1;
 			glutTimerFunc(TIMER_INTERVAL2, on_timer7, TIMER_ID2);
+			break;
+		case 't':
+			if(alpha)
+				alpha = 0;
+			else
+				alpha = 1;
+			break;
+		case 'f':
+			if(follow){
+				screen = activePlayer->getModelMatrix();
+				follow = 0;
+			}
+			else
+				follow = 1;
+			break;
+		case 'n':
+			if(alpha1 == 5)
+				alpha1 = 0;
+			else
+				alpha1 = alpha1 + 1;
+			std::cout << alpha1;
+			make_texture();
 			break;
 	}
 
@@ -285,7 +481,7 @@ static void on_mouse(int x, int y){
 		
 		float sensitivity = 0.005;
 		delta_x = x - width_a/2;
-		activePlayer->rotate(delta_x*sensitivity,glm::vec3( 0, 1, 0 ));
+		activePlayer->rotate(-delta_x*sensitivity,glm::vec3( 0, 1, 0 ));
 		glutWarpPointer(width_a/2, height_a/2);
 		glutPostRedisplay();
 		//float delta_y = y - width_a/2;
@@ -306,16 +502,11 @@ static void on_mouse(int x, int y){
 
 
 static Room create_room_1(){
-	glm::vec3 a = glm::vec3(0.0f, -1.0f, 0.0f);
-	glm::vec3 b = glm::vec3(5.0f, -1.0f, 0.0f);
-	glm::vec3 c = glm::vec3(5.0f, -1.0f, 5.0f);
-	glm::vec3 d = glm::vec3(10.0f, -1.0f, 2.5f);
-	glm::vec3 e = glm::vec3(15.0f, -1.0f, 5.0f);
-	glm::vec3 f = glm::vec3(15.0f, -1.0f, 0.0f);
-	glm::vec3 g = glm::vec3(20.0f, -1.0f, 0.0f);
-	glm::vec3 h = glm::vec3(15.0f, -1.0f, 15.0f);
-	glm::vec3 i = glm::vec3(10.0f, -1.0f, 10.0f);
-	glm::vec3 j = glm::vec3(5.0f, -1.0f, 15.0f);
+	glm::vec3 a = glm::vec3(-3.0f*2, -1.0f, 2.0f*2);
+	glm::vec3 b = glm::vec3(-3.0f*2, -1.0f, -2.0f*2);
+	glm::vec3 c = glm::vec3(4.0f*2, -1.0f, -2.0f*2);
+	glm::vec3 d = glm::vec3(4.0f*2, -1.0f, 2.0f*2);
+	
 
 
 	std::vector<glm::vec3> zidovi;
@@ -324,12 +515,6 @@ static Room create_room_1(){
 	zidovi.push_back(b);
 	zidovi.push_back(c);
 	zidovi.push_back(d);
-	zidovi.push_back(e);
-	zidovi.push_back(f);
-	zidovi.push_back(g);
-	zidovi.push_back(h);
-	zidovi.push_back(i);
-	zidovi.push_back(j);
 	zidovi.push_back(a);
 	
 
@@ -337,3 +522,7 @@ static Room create_room_1(){
 
 	return sampleRoom;
 }
+/*
+objectloader.h
+image.h
+*/

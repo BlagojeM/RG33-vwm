@@ -12,7 +12,7 @@
 class Player: public Position, public Transformable{
     public:
         Player();
-	    void Draw();
+	    void Draw(float alpha);
     private:
 };
 
