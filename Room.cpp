@@ -61,8 +61,8 @@ void Room::Draw(){
 	glBegin(GL_TRIANGLE_FAN);
 		glColor3f(0.3f, 0.3f, 0.3f);
 		for(int i = 0; i < n; i++)
-			glVertex3f(listOfPoints[i].x, listOfPoints[i].y + 2.0f, listOfPoints[i].z);
-		glVertex3f(listOfPoints[0].x, listOfPoints[0].y + 2.0f, listOfPoints[0].z);
+			glVertex3f(listOfPoints[i].x, listOfPoints[i].y + 3.0f, listOfPoints[i].z);
+		glVertex3f(listOfPoints[0].x, listOfPoints[0].y + 3.0f, listOfPoints[0].z);
 	glEnd();
 
 }

@@ -5,12 +5,12 @@ Player::Player() : Transformable(this) {
 }
 
 void Player::Draw(float alpha){
-		glRotatef(-20, 0, 1, 0);
-		glRotatef(13, 1, 0, 0);
-		glTranslatef(0, 0, -2);
-		// if(alpha)
-		// 	glColor4f(1, 0, 1, 1);
-		// else
-			glColor4f(1, 0, 1, 0);
-		glutSolidCube(0.7);
+		glColor4f(1, 0, 1, 0.7);
+		glTranslatef(0, 0, 0.13);
+		if(alpha)
+			glTranslatef(0, 0, -1);
+		glutSolidCube(0.1);
+		glScalef(1, 3, 1);
+		glTranslatef(0, -0.08, 0);
+		glutSolidCube(0.1);
 }
