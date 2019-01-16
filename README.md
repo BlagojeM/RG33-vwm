@@ -22,7 +22,7 @@ space - jump
 n - shuffle pictures on screen
 t - toggle screen on and off
 f - toggle screen follow on and off
-f - toggle betwen first person view and third person view
+v - toggle betwen first person view and third person view
 
 
 
