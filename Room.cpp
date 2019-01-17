@@ -68,7 +68,7 @@ void Room::Draw(){
 	 	for(float i = 0; i < 300; i++){
 			 glPushMatrix();
 			 glTranslatef(0, -1, 2*i - 100);
-			 glScalef(1, 0.05, 1);
+			 glScalef(1, 0.005, 1);
 			 
 			 glTranslatef(0, 0, 0);
 			 glutSolidCube(1.85);
