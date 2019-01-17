@@ -45,7 +45,7 @@ int m_r = 1;
 float colition_corection = 0;
 
 char view_mode = 0; // 0 for first person view, 1 for third person view
-float alpha = 0;
+float alpha = 1;
 int alpha1 = 0;
 int follow = 1;
 GLuint texture_name;
@@ -111,7 +111,7 @@ int main(int argc, char **argv){
 	glutReshapeFunc(on_reshape);
 	//glutPassiveMotionFunc(on_mouse);
 	glutTimerFunc(TIMER_INTERVAL2, colition_timer, TIMER_ID2);
-	glClearColor(0.5, 0.4, 0.4, 0);
+	glClearColor(0, 0, 0, 0);
 	glEnable(GL_DEPTH_TEST);
 	
 
@@ -221,14 +221,14 @@ static void jump_timer(int){
 static void colition_timer(int){
 	glm::mat4 tmpMatrix = glm::mat4(activePlayer->getModelMatrix());
 
-	if(tmpMatrix[3][0] > 7.95-colition_corection)
-		tmpMatrix[3][0] = 7.95-colition_corection;
-	if(tmpMatrix[3][0] < -5.95+colition_corection)
-		tmpMatrix[3][0] = -5.95+colition_corection;
-	if(tmpMatrix[3][2] > 3.95-colition_corection)
-		tmpMatrix[3][2] = 3.95-colition_corection;
-	if(tmpMatrix[3][2] < -3.95+colition_corection)
-		tmpMatrix[3][2] = -3.95+colition_corection;
+	if(tmpMatrix[3][0] > 1.95-colition_corection)//7.
+		tmpMatrix[3][0] = 1.95-colition_corection;
+	if(tmpMatrix[3][0] < -1.95+colition_corection)//5.
+		tmpMatrix[3][0] = -1.95+colition_corection;
+	if(tmpMatrix[3][2] > 149.95-colition_corection)//3.
+		tmpMatrix[3][2] = 149.95-colition_corection;
+	if(tmpMatrix[3][2] < -149.95+colition_corection)//3.
+		tmpMatrix[3][2] = -149.95+colition_corection;
 	
 	if(jump_ongoing <= 0){
 		if(tmpMatrix[3][1] != 0)
@@ -250,7 +250,6 @@ static void on_display(void){
     glLoadIdentity();
 
 	glLoadMatrixf(glm::value_ptr(activeCamera->getView()));
-	
 	//gluLookAt(0, 0, 0, 0, 0, 1, 0,1,0);
 	if(view_mode == 1){
 		activePlayer->translate(glm::vec3(0, 0, 1));
@@ -258,34 +257,34 @@ static void on_display(void){
 	}
 
 	//red cube for testing
-	glColor3f(1, 0, 0);
-	glPushMatrix();
-		glTranslatef(0, 0, 2);
-		glutSolidCube(0.5);
-	glPopMatrix();
+// 	glColor3f(1, 0, 0);
+// 	glPushMatrix();
+// 		glTranslatef(0, 0, 2);
+// 		glutSolidCube(0.5);
+// 	glPopMatrix();
 	
 	
-	//green cube for testing
-	glColor3f(0, 1, 0);
-	glPushMatrix();
-		glTranslatef(0, 0, -2);
-		glutSolidCube(0.5);
-	glPopMatrix();
+// 	//green cube for testing
+// 	glColor3f(0, 1, 0);
+// 	glPushMatrix();
+// 		glTranslatef(0, 0, -2);
+// 		glutSolidCube(0.5);
+// 	glPopMatrix();
 
 
-	//blue cube for testing
-	glColor3f(0, 0, 1);
-	glPushMatrix();
-		glTranslatef(2, 0, 0);
-		glutSolidCube(0.5);
-	glPopMatrix();
+// 	//blue cube for testing
+// 	glColor3f(0, 0, 1);
+// 	glPushMatrix();
+// 		glTranslatef(2, 0, 0);
+// 		glutSolidCube(0.5);
+// 	glPopMatrix();
 
-//black cube for testing
-	glColor3f(0, 0, 0);
-	glPushMatrix();
-		glTranslatef(-2, 0, 0);
-		glutSolidCube(0.5);
-	glPopMatrix();
+// //black cube for testing
+// 	glColor3f(0, 0, 0);
+// 	glPushMatrix();
+// 		glTranslatef(-2, 0, 0);
+// 		glutSolidCube(0.5);
+// 	glPopMatrix();
 	
 
 	Room room_1(create_room_1());

@@ -5,7 +5,7 @@ Player::Player() : Transformable(this) {
 }
 
 void Player::Draw(float alpha){
-		glColor4f(1, 0, 1, 0.7);
+		glColor3f(0.5, 0, 0);
 		glTranslatef(0, 0, 0.13);
 		if(alpha)
 			glTranslatef(0, 0, -1);
