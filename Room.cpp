@@ -62,9 +62,9 @@ void Room::Draw(){
 	 glEnd();
 	glPopMatrix();
 	
-	glTranslatef(0, 10, 0);
+	//glTranslatef(0, 10, 0);
 	glColor3f(0.7, 0.7, 0.9);
-	 glBegin(GL_QUADS);
+	 //glBegin(GL_QUADS);
 	 	for(float i = 0; i < 300; i++){
 			 glPushMatrix();
 			 glTranslatef(0, -1, 2*i - 100);
@@ -82,7 +82,7 @@ void Room::Draw(){
 		 }
 
 
-	 glEnd();
+	 //glEnd();
 
 	//celling
 	// glBegin(GL_TRIANGLE_FAN);
