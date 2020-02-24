@@ -26,7 +26,7 @@ t - toggle screen on and off
 f - toggle screen follow on and off  
 v - toggle betwen first person view and third person view  
 
-![alt text](https://github.com/BlagojeM/RG33-vwm/blob/master/screenshots/t.gif "Toggle Demonstration")
+
 ![alt text](https://github.com/BlagojeM/RG33-vwm/blob/master/screenshots/n.gif "Change Pictures Demonstration")
 ![alt text](https://github.com/BlagojeM/RG33-vwm/blob/master/screenshots/f.gif "Follow Demonstration")
 ![alt text](https://github.com/BlagojeM/RG33-vwm/blob/master/screenshots/v.gif "View Demonstration")
