@@ -9,23 +9,28 @@ and it shuffels some pictures* on command.
 
 Commands:
 
-w - move forward
-a - move left
-s - move backward
-d - move right
+w - move forward  
+a - move left  
+s - move backward  
+d - move right  
 
-j - look left
-k - look right
+j - look left  
+k - look right  
 
-space - jump
-
-n - shuffle pictures on screen
-t - toggle screen on and off
-f - toggle screen follow on and off
-v - toggle betwen first person view and third person view
-
+space - jump  
 
 ![alt text](https://github.com/BlagojeM/RG33-vwm/blob/master/screenshots/w.gif "Walking Demonstration")
+
+n - shuffle pictures on screen  
+t - toggle screen on and off  
+f - toggle screen follow on and off  
+v - toggle betwen first person view and third person view  
+
+![alt text](https://github.com/BlagojeM/RG33-vwm/blob/master/screenshots/t.gif "Toggle Demonstration")
+![alt text](https://github.com/BlagojeM/RG33-vwm/blob/master/screenshots/n.gif "Change Pictures Demonstration")
+![alt text](https://github.com/BlagojeM/RG33-vwm/blob/master/screenshots/f.gif "Follow Demonstration")
+![alt text](https://github.com/BlagojeM/RG33-vwm/blob/master/screenshots/v.gif "View Demonstration")
+
 
 
 
