@@ -25,7 +25,7 @@ f - toggle screen follow on and off
 v - toggle betwen first person view and third person view
 
 
-![alt text](.screenshots/w.gif "Walking Demonstration")
+![alt text](https://github.com/BlagojeM/RG33-vwm/blob/master/screenshots/w.gif "Walking Demonstration")
 
 
 
