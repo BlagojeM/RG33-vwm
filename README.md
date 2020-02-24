@@ -25,6 +25,8 @@ f - toggle screen follow on and off
 v - toggle betwen first person view and third person view
 
 
+![alt text](.screenshots/w.gif "Walking Demonstration")
+
 
 
 The idea when finnished is that it could be used with vr goggles and android phone** for a numberof free monitors 
